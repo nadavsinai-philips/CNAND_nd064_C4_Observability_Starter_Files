@@ -21,7 +21,8 @@ def init_tracer(service):
     logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
     config = Config(
-        config={"sampler": {"type": "const", "param": 1,}, "logging": True,},
+        config={"sampler": {"type": "const", "param": 1,}, "logging": True,
+        'reporter_batch_size': 1,},
         service_name=service,
     )
 
@@ -29,14 +30,10 @@ def init_tracer(service):
     return config.initialize_tracer()
 
 
-# starter code
-tracer = init_tracer("test-service")
 
-# not entirely sure but I believe there's a flask_opentracing.init_tracing() missing here
+jagertracer = init_tracer("test-service")
+tracer = FlaskTracing(jagertracer,True,app)
 redis_opentracing.init_tracing(tracer, trace_all_classes=False)
-
-with tracer.start_span("first-span") as span:
-    span.set_tag("first-tag", "100")
 
 
 @app.route("/")
@@ -46,26 +43,25 @@ def hello_world():
 
 @app.route("/alpha")
 def alpha():
-    for i in range(100):
-        do_heavy_work()  # removed the colon here since it caused a syntax error - not sure about its purpose?
+      for i in range(100):
+       # do_heavy_work()  # removed the colon here since it caused a syntax error - not sure about its purpose?
         if i % 100 == 99:
             time.sleep(10)
-    return "This is the Alpha Endpoint!"
+      return "This is the Alpha Endpoint!"
 
 
 @app.route("/beta")
 def beta():
-    r = requests.get("https://www.google.com/search?q=python")
-    dict = {}
-    for key, value in r.headers.items():
-        print(key, ":", value)
-        dict.update({key: value})
-    return jsonify(dict)
+        r = requests.get("https://www.google.com/search?q=python")
+        dict = {}
+        for key, value in r.headers.items():
+            print(key, ":", value)
+            dict.update({key: value})
+        return jsonify(dict)
 
 
-@app.route(
-    "/writeredis"
-)  # needed to rename this view to avoid function name collision with redis import
+@app.route(  "/writeredis") 
+@tracer.trace() # needed to rename this view to avoid function name collision with redis import
 def writeredis():
     # start tracing the redis client
     redis_opentracing.trace_client(rdb)
