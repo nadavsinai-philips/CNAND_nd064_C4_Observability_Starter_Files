@@ -68,7 +68,7 @@ def writeredis():
     r = requests.get("https://www.google.com/search?q=python")
     dict = {}
     # put the first 50 results into dict
-    for key, value in r.headers.items()[:50]:
+    for key, value in list(r.headers.items())[:50]:
         print(key, ":", value)
         dict.update({key: value})
     rdb.mset(dict)
