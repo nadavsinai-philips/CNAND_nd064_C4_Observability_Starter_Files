@@ -2,19 +2,28 @@
 
 ## Verify the monitoring installation
 
-*TODO:* run `kubectl` command to show the running pods and services for all components. Take a screenshot of the output and include it here to verify the installation
+TASK1 - DONE - run `kubectl` command to show the running pods and services for all components.  - screenshots available (task 1 -a,b,c)
 
 ## Setup the Jaeger and Prometheus source
-*TODO:* Expose Grafana to the internet and then setup Prometheus as a data source. Provide a screenshot of the home page after logging into Grafana.
+TASK2 - DONE -  Expose Grafana to the internet and then setup Prometheus as a data source. screenshot after logging into Grafana - task2
 
 ## Create a Basic Dashboard
-*TODO:* Create a dashboard in Grafana that shows Prometheus as a source. Take a screenshot and include it here.
+TASK3 - DONE - Create a dashboard in Grafana that shows Prometheus as a source. Take a screenshot and include it here.
 
 ## Describe SLO/SLI
-*TODO:* Describe, in your own words, what the SLIs are, based on an SLO of *monthly uptime* and *request response time*.
+TASK4 - DONE - Describe, in your own words, what the SLIs are, based on an SLO of *monthly uptime* and *request response time*.
+SLI for Monthly uptime is a mesurement of uptime (as observed by a liveness prob fro example) divided by total time in a month to get percentage 
+SLI for request response time is a mesurement of  average time per request or even maximum time per request with theshold filtering of some small number of edge case
 
 ## Creating SLI metrics.
-*TODO:* It is important to know why we want to measure certain metrics for our customer. Describe in detail 5 metrics to measure these SLIs. 
+TASK5 - It is important to know why we want to measure certain metrics for our customer. Describe in detail 5 metrics to measure these SLIs. 
+1. number of failed requests - to remove these from r/s time 
+2. total number of requests - to caclulate percentage
+3. time for request/response - to calculate r/s average time
+4. workload in status other than running in percentage of time in timeframe (day,months etc)
+5. 
+
+
 
 ## Create a Dashboard to measure our SLIs
 *TODO:* Create a dashboard to measure the uptime of the frontend and backend services We will also want to measure to measure 40x and 50x errors. Create a dashboard that show these values over a 24 hour period and take a screenshot.
