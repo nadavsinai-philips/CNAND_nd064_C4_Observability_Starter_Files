@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-
+from prometheus_flask_exporter import PrometheusMetrics
 import pymongo
 from flask_pymongo import PyMongo
 
@@ -11,7 +11,7 @@ app.config[
 ] = "mongodb://example-mongodb-svc.default.svc.cluster.local:27017/example-mongodb"
 
 mongo = PyMongo(app)
-
+metrics = PrometheusMetrics(app)
 
 @app.route("/")
 def homepage():
