@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+   "sidecar.jaegertracing.io/inject": "simplest" 
   name: backend-app
 spec:
   replicas: 3
@@ -14,9 +16,12 @@ spec:
     spec:
       containers:
       - name: backend
-        image: nadavsinai/backend-observ-app:latest
+        image: nadavsinai/backend-observ-app:0.0.5
         ports:
-        - containerPort: 8081
+          - containerPort: 8081
+        env:
+           - name: JAEGER_REPORTER_LOG_SPANS
+             value: "true"
 ---
 apiVersion: v1
 kind: Service

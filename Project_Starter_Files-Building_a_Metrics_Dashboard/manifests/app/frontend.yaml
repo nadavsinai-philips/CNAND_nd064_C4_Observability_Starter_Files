@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+   "sidecar.jaegertracing.io/inject": "simplest" 
   name: frontend-app
 spec:
   replicas: 3
@@ -14,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: nadavsinai/frontend-observ-app:latest
+        image: nadavsinai/frontend-observ-app:0.0.5
         ports:
         - containerPort: 8080
 ---

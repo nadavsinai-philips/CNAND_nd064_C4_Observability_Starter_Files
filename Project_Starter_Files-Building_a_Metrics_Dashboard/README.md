@@ -8,7 +8,7 @@ TASK1 - DONE - run `kubectl` command to show the running pods and services for a
 TASK2 - DONE -  Expose Grafana to the internet and then setup Prometheus as a data source. screenshot after logging into Grafana - task2
 
 ## Create a Basic Dashboard
-TASK3 - DONE - Create a dashboard in Grafana that shows Prometheus as a source. Take a screenshot and include it here.
+TASK3 - DONE - Create a dashboard in" Grafana that shows Prometheus as a source. Take a screenshot and include it here.
 
 ## Describe SLO/SLI
 TASK4 - DONE - Describe, in your own words, what the SLIs are, based on an SLO of *monthly uptime* and *request response time*.
@@ -20,8 +20,8 @@ TASK5 - It is important to know why we want to measure certain metrics for our c
 1. number of failed requests - to remove these from r/s time 
 2. total number of requests - to caclulate percentage
 3. time for request/response - to calculate r/s average time
-4. workload in status other than running in percentage of time in timeframe (day,months etc)
-5. 
+4. service uptime in percentage of timeframe (day,months etc)
+5. system load - memory/cpu usage
 
 
 
