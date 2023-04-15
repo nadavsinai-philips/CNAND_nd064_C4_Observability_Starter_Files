@@ -1,18 +1,46 @@
-from flask import Flask, render_template, request, jsonify
-from prometheus_flask_exporter import PrometheusMetrics
-from flask_pymongo import PyMongo
-from jaeger_client import Config
+import logging
+from flask import Flask, jsonify, render_template
 from flask_opentracing import FlaskTracing
+from jaeger_client import Config
+from jaeger_client.metrics.prometheus import PrometheusMetricsFactory
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from prometheus_flask_exporter import PrometheusMetrics
+
+from flask_pymongo import PyMongo
+
 
 app = Flask(__name__)
-config = Config(config={'sampler': {'type': 'const', 'param': 1},
-                                'logging': True, 
-                                'service_name':"backend"})
-                        # Also, provide a hostname of Jaeger instance to send traces to.
-                        # Service name can be arbitrary string describing this particular web service.
-                     
-jaeger_tracer = config.initialize_tracer()
-tracing = FlaskTracing(jaeger_tracer)
+FlaskInstrumentor().instrument_app(app)
+RequestsInstrumentor().instrument()
+
+metrics = PrometheusMetrics(app)
+metrics.info("app_info", "Application info", version="1.0.3")
+
+logging.getLogger("").handlers = []
+logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+def init_tracer(service):
+
+    config = Config(
+        config={
+            "sampler": {"type": "const", "param": 1},
+            "logging": True,
+            "reporter_batch_size": 1,
+        },
+        service_name=service,
+        validate=True,
+        metrics_factory=PrometheusMetricsFactory(service_name_label=service),
+    )
+
+    # this call also sets opentracing.tracer
+    return config.initialize_tracer()
+
+
+tracer = init_tracer("backend")
+
+flask_tracer = FlaskTracing(tracer, True, app)
 
 app.config["MONGO_DBNAME"] = "example-mongodb"
 app.config[
@@ -20,19 +48,16 @@ app.config[
 ] = "mongodb://example-mongodb-svc.default.svc.cluster.local:27017/example-mongodb"
 
 mongo = PyMongo(app)
-metrics = PrometheusMetrics(app)
-@tracing.trace() 
+
 @app.route("/")
 def homepage():
     return "Hello World"
 
-@tracing.trace() 
 @app.route("/api")
 def my_api():
     answer = "something"
     return jsonify(repsonse=answer)
 
-@tracing.trace() 
 @app.route("/star", methods=["POST"])
 def add_star():
     star = mongo.db.stars
